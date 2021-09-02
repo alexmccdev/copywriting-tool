@@ -1,0 +1,115 @@
+@tailwind base;
+@layer base {
+    :root {
+        --color-primary: theme('colors.primary');
+        --color-secondary: theme('colors.secondary');
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+    ::-webkit-scrollbar {
+        @apply hidden;
+    }
+
+    @import url(https://fonts.googleapis.com/css2?family=Roboto+Slab&display=swap);
+
+    /* Emoji Mart Custom Styles */
+    .emoji-mart {
+        @apply font-sans !important;
+    }
+
+    .emoji-mart svg {
+        @apply inline align-baseline;
+    }
+}
+@tailwind components;
+@tailwind utilities;
+
+/* Keep outside @layers to avoid purge */
+
+div#__next {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+        'header'
+        'main'
+        'footer';
+    @apply grid w-screen h-screen overflow-x-auto;
+}
+
+header {
+    grid-area: header;
+    @apply sticky top-0 z-30 flex items-center justify-between flex-none h-16 px-4 bg-white;
+}
+
+main {
+    grid-area: main;
+    @apply w-full max-w-6xl gap-8 px-8 py-10 mx-auto;
+}
+
+footer {
+    grid-area: footer;
+    @apply flex items-center justify-between flex-none h-10 px-4;
+}
+
+.one-col {
+    @apply flex flex-col flex-grow w-full mx-auto;
+}
+
+.three-col,
+.two-col {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        'left-main'
+        'center-main';
+}
+
+.left-main {
+    grid-area: left-main;
+}
+
+.center-main {
+    grid-area: center-main;
+}
+
+.right-main {
+    grid-area: right-main;
+    display: none; /* not displayed on xs screen */
+}
+
+@screen md {
+    .two-col {
+        grid-template-columns: 1fr 3fr;
+        grid-template-rows: 1fr;
+        grid-template-areas: 'left-main center-main';
+    }
+
+    .three-col {
+        grid-template-columns: 1fr 3fr;
+        grid-template-rows: auto 1fr;
+        grid-template-areas:
+            'left-main center-main'
+            'right-main center-main';
+    }
+
+    .right-main {
+        grid-area: right-main;
+        display: block;
+    }
+}
+
+@screen lg {
+    .three-col {
+        grid-template-columns: 1fr 3fr 1fr;
+        grid-template-rows: auto;
+        grid-template-areas: 'left-main center-main right-main';
+    }
+
+    .right-main {
+        grid-area: right-main;
+        display: block;
+    }
+}
