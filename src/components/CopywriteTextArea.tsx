@@ -1,9 +1,14 @@
+import { BaseEmoji } from 'emoji-mart'
+import GraphemeSplitter from 'grapheme-splitter'
 import React, { useEffect, useState } from 'react'
 import { HiOutlineClipboardCopy, HiOutlineEmojiHappy, HiOutlineTrash } from 'react-icons/hi'
+import EmojiPicker from './EmojiPicker'
 
 interface ICopywriteTextAreaProps {
     onDelete: () => void
     onUpdate: (updateData: CopyData) => void
+    toggleEmojiMart: () => void
+    emojiMartVisible: boolean
     data: CopyData
 }
 
@@ -14,7 +19,13 @@ export type CopyData = {
     countType: 'word' | 'char' | 'charSpace'
 }
 
-const CopywriteTextArea: React.FC<ICopywriteTextAreaProps> = ({ onDelete, onUpdate, data }) => {
+const CopywriteTextArea: React.FC<ICopywriteTextAreaProps> = ({
+    onDelete,
+    onUpdate,
+    toggleEmojiMart,
+    emojiMartVisible,
+    data,
+}) => {
     const [title, setTitle] = useState<string>(data.title)
     const [copy, setCopy] = useState<string>(data.copy)
     const [countType, setCountType] = useState<'word' | 'char' | 'charSpace'>(data.countType)
@@ -24,12 +35,12 @@ const CopywriteTextArea: React.FC<ICopywriteTextAreaProps> = ({ onDelete, onUpda
     const [charSpaceCount, setCharSpaceCount] = useState<number>(0)
 
     const [copied, setCopied] = useState<boolean>(false)
-    const [emojiVisible, setEmojiVisible] = useState<boolean>(false)
 
     useEffect(() => {
-        setWordCount(copy.match(/(\w+)/g)?.length || 0)
-        setCharCount(copy.replace(/\s+/g, '').length)
-        setCharSpaceCount(copy.length)
+        const splitter = new GraphemeSplitter()
+        setWordCount(copy.replace(/\s+/g, ' ').trim().split(' ')?.length || 0)
+        setCharCount(splitter.countGraphemes(copy.replace(/\s+/g, '')))
+        setCharSpaceCount(splitter.countGraphemes(copy))
     }, [copy])
 
     const displayCopied = () => {
@@ -50,11 +61,11 @@ const CopywriteTextArea: React.FC<ICopywriteTextAreaProps> = ({ onDelete, onUpda
     }, [title, copy, countType])
 
     return (
-        <div className="flex p-8 my-4 border-b">
+        <div className="flex py-8 border-b">
             <div className="flex flex-col w-1/6">
                 <input
                     type="text"
-                    className="flex-grow-0 p-2 border-b"
+                    className="flex-grow-0 p-2 text-xl border-b"
                     placeholder="Copy title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
@@ -110,20 +121,22 @@ const CopywriteTextArea: React.FC<ICopywriteTextAreaProps> = ({ onDelete, onUpda
                     >
                         <HiOutlineTrash size={'1.5rem'} />
                     </span>
-                    <span
-                        role="button"
-                        className="flex items-center h-full p-2 rounded-full cursor-pointer"
-                        onClick={() => setEmojiVisible((prev) => !prev)}
-                    >
-                        <HiOutlineEmojiHappy size={'1.5rem'} />
-                    </span>
-                    {/* <div
-                        className={`absolute ${
-                            emojiVisible ? 'transition-all h-full opacity-100 mt-12' : 'opacity-0 h-0 transition-all'
-                        }`}
-                    >
-                        <EmojiPicker />
-                    </div> */}
+                    <div className="relative">
+                        <span
+                            role="button"
+                            className="flex items-center h-full p-2 rounded-full cursor-pointer"
+                            onClick={toggleEmojiMart}
+                        >
+                            <HiOutlineEmojiHappy size={'1.5rem'} />
+                        </span>
+                        <div className={`absolute right-0 z-50 top-12 ${!emojiMartVisible ? 'hidden' : 'visible'}`}>
+                            <EmojiPicker
+                                onSelect={(emoji) => {
+                                    setCopy((prev) => (prev += (emoji as BaseEmoji).native))
+                                }}
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
