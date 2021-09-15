@@ -38,7 +38,7 @@ const CopywriteTextArea: React.FC<ICopywriteTextAreaProps> = ({
 
     useEffect(() => {
         const splitter = new GraphemeSplitter()
-        setWordCount(copy.replace(/\s+/g, ' ').trim().split(' ')?.length || 0)
+        setWordCount(copy.length === 0 ? 0 : copy.replace(/\s+/g, ' ').trim().split(' ')?.length || 0)
         setCharCount(splitter.countGraphemes(copy.replace(/\s+/g, '')))
         setCharSpaceCount(splitter.countGraphemes(copy))
     }, [copy])
@@ -61,16 +61,16 @@ const CopywriteTextArea: React.FC<ICopywriteTextAreaProps> = ({
     }, [title, copy, countType])
 
     return (
-        <div className="flex py-8 border-b">
-            <div className="flex flex-col w-1/6">
+        <div className="flex flex-col pb-8 border-b md:flex-row">
+            <div className="flex mb-4 md:w-1/6 md:flex-col md:mb-0">
                 <input
                     type="text"
-                    className="flex-grow-0 p-2 text-xl border-b"
+                    className="flex-grow p-2 text-xl border-b md:flex-grow-0"
                     placeholder="Copy title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                 />
-                <p className="p-2 text-3xl">
+                <p className="pl-4 pr-2 text-4xl md:pt-4 md:px-2">
                     {countType === 'word' && wordCount}
                     {countType === 'char' && charCount}
                     {countType === 'charSpace' && charSpaceCount}
@@ -78,13 +78,13 @@ const CopywriteTextArea: React.FC<ICopywriteTextAreaProps> = ({
             </div>
 
             <textarea
-                className="flex-grow w-full p-2 mx-8 border rounded-sm"
+                className="flex-grow w-full p-2 mb-4 border rounded-sm md:mx-8 md:mb-0"
                 placeholder="Your copy here..."
                 value={copy}
                 onChange={(e) => setCopy(e.target.value)}
                 spellCheck={true}
             />
-            <div className="flex flex-col">
+            <div className="flex md:flex-col">
                 <select
                     className="p-2 border rounded-sm"
                     value={countType}
@@ -94,36 +94,11 @@ const CopywriteTextArea: React.FC<ICopywriteTextAreaProps> = ({
                     <option value="charSpace">Characters + spaces</option>
                     <option value="char">Characters - spaces</option>
                 </select>
-                <div className="flex justify-end mt-8">
-                    <div className="relative flex h-full p-2 rounded-full cursor-pointer">
-                        <span
-                            role="button"
-                            className=""
-                            onClick={() => {
-                                navigator.clipboard.writeText(copy)
-                                displayCopied()
-                            }}
-                        >
-                            <HiOutlineClipboardCopy size={'1.5rem'} />
-                        </span>
-                        <div
-                            className={`transition-opacity duration-150 ease-out text-xs p-2 absolute flex justify-center rounded-sm top-10 -left-4 -right-3 bg-black dark:bg-white dark:text-black text-gray-200 ${
-                                copied ? 'opacity-100' : 'opacity-0'
-                            }`}
-                        >
-                            Copied!
-                        </div>
-                    </div>
-                    <span
-                        role="button"
-                        className="flex items-center h-full p-2 rounded-full cursor-pointer"
-                        onClick={onDelete}
-                    >
-                        <HiOutlineTrash size={'1.5rem'} />
-                    </span>
+                <div className="flex justify-end w-full md:mt-8">
                     <div className="relative">
                         <span
                             role="button"
+                            aria-label="Emoji picker"
                             className="flex items-center h-full p-2 rounded-full cursor-pointer"
                             onClick={toggleEmojiMart}
                         >
@@ -136,6 +111,35 @@ const CopywriteTextArea: React.FC<ICopywriteTextAreaProps> = ({
                                 }}
                             />
                         </div>
+                    </div>
+                    <div className="flex">
+                        <div className="relative flex h-full p-2 rounded-full cursor-pointer">
+                            <span
+                                role="button"
+                                aria-label="Copy to clipboard"
+                                onClick={() => {
+                                    navigator.clipboard.writeText(copy)
+                                    displayCopied()
+                                }}
+                            >
+                                <HiOutlineClipboardCopy size={'1.5rem'} />
+                            </span>
+                            <div
+                                className={`transition-opacity duration-150 ease-out text-xs p-2 absolute flex justify-center rounded-sm top-10 -left-4 -right-3 bg-black dark:bg-white dark:text-black text-gray-200 ${
+                                    copied ? 'opacity-100' : 'opacity-0'
+                                }`}
+                            >
+                                Copied!
+                            </div>
+                        </div>
+                        <span
+                            role="button"
+                            aria-label="Delete item"
+                            className="flex items-center h-full p-2 rounded-full cursor-pointer"
+                            onClick={onDelete}
+                        >
+                            <HiOutlineTrash size={'1.5rem'} />
+                        </span>
                     </div>
                 </div>
             </div>

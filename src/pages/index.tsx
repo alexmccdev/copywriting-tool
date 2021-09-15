@@ -1,8 +1,9 @@
 import CopywriteTextArea, { CopyData } from '@components/CopywriteTextArea'
 import Layout from '@components/Layout'
+import useClickOutside from '@hooks/useClickOutside'
 import useLocalStorage from '@hooks/useLocalStorage'
 import type { NextPage } from 'next'
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 
 const Home: NextPage = () => {
     const [textAreas, setTextAreas] = useLocalStorage<CopyData[]>('copy-items', [
@@ -11,11 +12,14 @@ const Home: NextPage = () => {
 
     const [emojiMart, setEmojiMart] = useState<number | null>(null)
 
+    const emojiMartRef = useRef(null)
+    useClickOutside(emojiMartRef, () => setEmojiMart(null))
+
     return (
         <Layout title="Home" template="one-col">
             <div>
                 {textAreas.map((ta) => (
-                    <div key={ta.id}>
+                    <div className="mt-8 first:mt-0" key={ta.id} ref={ta.id === emojiMart ? emojiMartRef : null}>
                         <CopywriteTextArea
                             onDelete={() => setTextAreas((prev) => prev.filter((x) => x !== ta))}
                             onUpdate={(updateData: CopyData) =>
